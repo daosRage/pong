@@ -6,5 +6,8 @@ setting_win = {
 }
 setting_board = {
     "WIDTH": 20,
-    "HEIGHT": 100
+    "HEIGHT": 300
+}
+setting_ball = {
+    "RADIUS": 15
 }
