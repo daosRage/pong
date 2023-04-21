@@ -28,10 +28,11 @@ def run():
         window.fill((0,0,0))
         pygame.draw.rect(window, (255,255,255), board_left)
         pygame.draw.rect(window, (255,255,255), board_right)
-        pygame.draw.circle(window, (255, 255, 255), (ball.X, ball.Y), ball.RADIUS)
+        pygame.draw.circle(window, (255, 255, 255), ball.RECT.center, ball.RADIUS)
         board_left.move()
         board_right.move()
-        ball.move(board_left, board_right)
+        ball.move(board_left, board_right, window)
+        ball.POINT.blit_point(window)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
