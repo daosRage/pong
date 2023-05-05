@@ -2,6 +2,7 @@ import pygame
 from data import *
 from random import *
 import time
+import json
 
 
 class Board(pygame.Rect):
@@ -48,12 +49,17 @@ class Ball():
             self.SPEED = self.CONST
         self.ANGLE = ang * uniform(abs(self.SPEED // 2), abs(self.SPEED))
         coff = abs(self.SPEED) / abs((self.SPEED ** 2 + self.ANGLE ** 2) ** 0.5)
-        print("1",self.ANGLE, self.SPEED, coff)
+        #print("1",self.ANGLE, self.SPEED, coff)
         self.ANGLE *= coff
         self.SPEED *= coff
-        print("2",self.ANGLE, self.SPEED)
+        #print("2",self.ANGLE, self.SPEED)
 
     def restart(self, board_left, board_right, window):
+        if self.POINT.LEFT_POINT == 1 or self.POINT.RIGHT_POINT == 1:
+            history[str(time.time())] = {self.POINT.NAME_LEFT: self.POINT.LEFT_POINT, self.POINT.NAME_RIGHT: self.POINT.RIGHT_POINT}
+            with open("history.json", "w", encoding= "utf-8") as file:
+                json.dump(history, file, indent= 4)
+
         self.SPEED = choice([-self.CONST, self.CONST])
         self.ANGLE = 0
         self.X, self.Y = restart["RESTART_BALL"]
@@ -69,7 +75,6 @@ class Ball():
         time.sleep(2)
 
     def move(self, board_left, board_right, window):
-
         if self.X - self.RADIUS <= 0:
             self.POINT.RIGHT_POINT += 1
             self.restart(board_left, board_right, window)
@@ -100,6 +105,57 @@ class Ball():
         self.RECT.y = self.Y
         self.X += self.SPEED
         self.RECT.x = self.X
-        print(self.X - self.CONST, self.Y - self.CONST, self.RECT.x, self.RECT.y)
-        print((self.SPEED ** 2 + self.ANGLE ** 2) ** 0.5)
+        #print(self.X - self.CONST, self.Y - self.CONST, self.RECT.x, self.RECT.y)
+        #print((self.SPEED ** 2 + self.ANGLE ** 2) ** 0.5)
         self.a.add((self.SPEED ** 2 + self.ANGLE ** 2) ** 0.5)
+
+class Menu():
+    def __init__(self, width, height, count):
+        #super().__init__(x, y, width, height)
+        self.BUTTONS = list()
+        self.width = width
+        self.height  = height
+        self.count = count
+        self.FONT = pygame.font.SysFont("Comic Sans MS", 40)
+        for button in range(count):
+            self.BUTTONS.append(pygame.Rect(setting_win["WIDTH"] // 2 - width // 2,
+                                            setting_win["HEIGHT"] // 2 - count * ((height + 15) // 2 ) + (height + 15) * button,
+                                            width,
+                                            height))
+        
+    def draw_menu(self, window):
+        window.fill((255,255,200))
+        for button in self.BUTTONS:
+            pygame.draw.rect(window, (100,130,200), button)
+        window.blit(self.FONT.render("Start", True, (0,0,0)), 
+        (setting_win["WIDTH"] // 2 - self.width // 2 + 50, setting_win["HEIGHT"] // 2 - self.count * ((self.height + 15) // 2 ) + (self.height + 15) * 0 - 7))
+        window.blit(self.FONT.render("Mode", True, (0,0,0)), 
+        (setting_win["WIDTH"] // 2 - self.width // 2 + 50, setting_win["HEIGHT"] // 2 - self.count * ((self.height + 15) // 2 ) + (self.height + 15) * 1 - 7))
+        window.blit(self.FONT.render("History", True, (0,0,0)), 
+        (setting_win["WIDTH"] // 2 - self.width // 2 + 30, setting_win["HEIGHT"] // 2 - self.count * ((self.height + 15) // 2 ) + (self.height + 15) * 2 - 7))
+        window.blit(self.FONT.render("Exit", True, (0,0,0)), 
+        (setting_win["WIDTH"] // 2 - self.width // 2 + 58, setting_win["HEIGHT"] // 2 - self.count * ((self.height + 15) // 2 ) + (self.height + 15) * 3 - 7))
+
+    
+    def click(self, cord):
+        if self.BUTTONS[0].collidepoint(cord):
+            return 1
+        if self.BUTTONS[2].collidepoint(cord):
+            return 3
+        
+        return 0
+    
+    def show_history(self, window):
+        window.fill((255,255,200))
+        font = pygame.font.Font(None, 25)
+        y= 10
+        x = 50
+        for key_main  in history.keys():
+            window.blit(font.render(f"-", True, (0,0,0)), (225, y))
+            for key, value in zip(history[key_main].keys(), history[key_main].values()):
+                window.blit(font.render(f"{key} : {value}", True, (0,0,0)), (x, y))
+                x += 300
+            x = 50
+            y += 50
+
+

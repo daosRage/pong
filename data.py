@@ -1,3 +1,9 @@
+import json
+
+history = dict()
+
+with open("history.json", "r", encoding= "utf-8") as file:
+    history = json.load(file)
 
 
 setting_win = {
